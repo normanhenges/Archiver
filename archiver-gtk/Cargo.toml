@@ -1,0 +1,9 @@
+[package]
+name = "archiver-gtk"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+adw = { version = "0.7.1", package = "libadwaita", features = ["v1_6"] }
+gtk = { version = "0.9.4", package = "gtk4", features = ["v4_16"] }
+rusqlite = { version = "0.32.1", features = ["bundled"] }

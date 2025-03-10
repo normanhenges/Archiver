@@ -1,0 +1,140 @@
+CREATE TABLE IF NOT EXISTS "person" (
+	"id" INTEGER NOT NULL UNIQUE,
+	"firstname" VARCHAR,
+	"lastname" VARCHAR,
+	PRIMARY KEY("id")
+);
+
+CREATE TABLE IF NOT EXISTS "day" (
+	"id" INTEGER NOT NULL UNIQUE,
+	"key" VARCHAR NOT NULL UNIQUE,
+	"name" VARCHAR NOT NULL,
+	"weather_id" INTEGER,
+	PRIMARY KEY("id"),
+	FOREIGN KEY ("weather_id") REFERENCES "weather"("id")
+	ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS "milestone" (
+	"id" INTEGER NOT NULL UNIQUE,
+	"name" VARCHAR NOT NULL,
+	"description" TEXT,
+	"day_id" INTEGER NOT NULL,
+	PRIMARY KEY("id"),
+	FOREIGN KEY ("day_id") REFERENCES "day"("id")
+	ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS "event" (
+	"id" INTEGER NOT NULL UNIQUE,
+	"name" VARCHAR NOT NULL,
+	"description" TEXT,
+	"time" TIME,
+	"day_id" INTEGER NOT NULL,
+	"place_id" INTEGER,
+	"weather_id" INTEGER,
+	PRIMARY KEY("id"),
+	FOREIGN KEY ("day_id") REFERENCES "day"("id")
+	ON UPDATE NO ACTION ON DELETE NO ACTION,
+	FOREIGN KEY ("weather_id") REFERENCES "weather"("id")
+	ON UPDATE NO ACTION ON DELETE NO ACTION,
+	FOREIGN KEY ("place_id") REFERENCES "place"("id")
+	ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS "month" (
+	"id" INTEGER NOT NULL UNIQUE,
+	"key" NUMERIC NOT NULL UNIQUE,
+	"name" VARCHAR NOT NULL,
+	PRIMARY KEY("id")
+);
+
+CREATE TABLE IF NOT EXISTS "year" (
+	"id" INTEGER NOT NULL UNIQUE,
+	"key" NUMERIC NOT NULL UNIQUE,
+	"name" VARCHAR,
+	PRIMARY KEY("id")
+);
+
+CREATE TABLE IF NOT EXISTS "photo" (
+	"id" INTEGER NOT NULL UNIQUE,
+	"time" TIME NOT NULL,
+	"day_id" INTEGER NOT NULL,
+	"location_id" INTEGER,
+	"filepath" VARCHAR NOT NULL,
+	PRIMARY KEY("id"),
+	FOREIGN KEY ("location_id") REFERENCES "location"("id")
+	ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY ("day_id") REFERENCES "day"("id")
+	ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+/* https://dev.mysql.com/doc/refman/5.7/en/spatial-convenience-functions.html */
+CREATE TABLE IF NOT EXISTS "location" (
+	"id" INTEGER NOT NULL UNIQUE,
+	"latitude" NUMERIC NOT NULL,
+	"longitude" NUMERIC NOT NULL,
+	PRIMARY KEY("id")
+);
+
+CREATE TABLE IF NOT EXISTS "place" (
+	"id" INTEGER NOT NULL UNIQUE,
+	"name" VARCHAR NOT NULL,
+	"location_id" INTEGER NOT NULL,
+	"map_radius" REAL NOT NULL,
+	PRIMARY KEY("id"),
+	FOREIGN KEY ("location_id") REFERENCES "location"("id")
+	ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "notd" (
+	"id" INTEGER NOT NULL UNIQUE,
+	"text" TEXT,
+	"day_id" INTEGER NOT NULL,
+	PRIMARY KEY("id"),
+	FOREIGN KEY ("day_id") REFERENCES "day"("id")
+	ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS "weather" (
+	"id" INTEGER NOT NULL UNIQUE,
+	"temperature_min" NUMERIC,
+	"temperature_max" NUMERIC,
+	"wind" NUMERIC,
+	"clouds" NUMERIC,
+	"name" VARCHAR,
+	"description" VARCHAR,
+	"wmo_code" INTEGER,
+	PRIMARY KEY("id")
+);
+
+CREATE TABLE IF NOT EXISTS "whatsapp_message" (
+	"id" INTEGER NOT NULL UNIQUE,
+	"sender_id" INTEGER NOT NULL,
+	"receiver_id" INTEGER NOT NULL,
+	"text" TEXT,
+	"is_favorite" BOOLEAN NOT NULL,
+	"time" TIME NOT NULL,
+	"day_id" INTEGER NOT NULL,
+	PRIMARY KEY("id"),
+	FOREIGN KEY ("sender_id") REFERENCES "person"("id")
+	ON UPDATE NO ACTION ON DELETE NO ACTION,
+	FOREIGN KEY ("receiver_id") REFERENCES "person"("id")
+	ON UPDATE NO ACTION ON DELETE NO ACTION,
+	FOREIGN KEY ("day_id") REFERENCES "day"("id")
+	ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS "calendar_event" (
+	"id" INTEGER NOT NULL UNIQUE,
+	"name" VARCHAR NOT NULL,
+	"description" TEXT,
+	"time" TIME,
+	"day_id" INTEGER NOT NULL,
+	"location_id" INTEGER,
+	PRIMARY KEY("id"),
+	FOREIGN KEY ("day_id") REFERENCES "day"("id")
+	ON UPDATE NO ACTION ON DELETE NO ACTION,
+	FOREIGN KEY ("location_id") REFERENCES "location"("id")
+	ON UPDATE NO ACTION ON DELETE NO ACTION
+);
