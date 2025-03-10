@@ -68,6 +68,7 @@ fn build_ui(app: &Application) {
         .title_widget(&WindowTitle::builder().title("Archiver").build())
         .build();
 
+    // Build main content box layout
     let content = GtkBox::builder()
         .orientation(Orientation::Vertical)
         .spacing(0)
@@ -78,10 +79,11 @@ fn build_ui(app: &Application) {
         .spacing(12)
         .build();
 
-    let scrolled_window = ScrolledWindow::builder()
-        .min_content_width(200)  // Minimum width of left column
-        .min_content_height(400) // Minimum height (optional)
-        .vexpand(true)           // Expand vertically
+    // Build srollable day list in left column
+    let day_list_scroll_window = ScrolledWindow::builder()
+        .min_content_width(200)
+        .min_content_height(400)
+        .vexpand(true)
         .build();
     
     let day_list = ListBox::builder()
@@ -92,15 +94,30 @@ fn build_ui(app: &Application) {
         .placeholder_text("Search for Day...")
         .build();
 
-    // Build widgets
     day_list.append(&search_entry);
-    /*day_list.append(&scrolled_window);*/
-    /*scrolled_window.append(&day_list);*/
-    scrolled_window.set_child(Some(&day_list)); // Add ListBox to ScrolledWindow
-    main_box.append(&scrolled_window); // Add ScrolledWindow to main box
+    day_list_scroll_window.set_child(Some(&day_list));
+
+    // Build scrollable content box in right column
+    let content_scroll_window = ScrolledWindow::builder()
+        .min_content_width(400)
+        .min_content_height(400)
+        .vexpand(true)
+        .build();
+    let content_box = GtkBox::builder()
+        .orientation(Orientation::Vertical)
+        .spacing(12)
+        .build();
+    content_scroll_window.set_child(Some(&content_box));
+
+    let content_header: Label = Label::builder()
+        .label("Entries")
+        .margin_top(12)
+        .margin_bottom(12)
+        .build();
+    content_box.append(&content_header);
 
     // Pack content_label inside Rc<RefCell<...>>
-    let content_label = Rc::new(RefCell::new(Label::new(Some("Please select a Day from the left column."))));
+    //let content_label = Rc::new(RefCell::new(Label::new(Some("Please select a Day from the left column."))));
 
     // Add placeholder days
     let placeholder_days = vec!["2024-06-01", "2024-06-02", "2024-06-03", "2024-06-04", "2024-06-05", "2024-06-06", "2024-06-07", "2024-06-08", "2024-06-09", "2024-06-10", "2024-06-11",
@@ -120,15 +137,14 @@ fn build_ui(app: &Application) {
         day_list.append(&row);
     }
 
-    // Clone Rc for the Closure
-    let content_label_clone = Rc::clone(&content_label);
+    // Set up event handler
+    let content_header_clone = content_header.clone();
     day_list.connect_row_selected(move |_, row| {
         if let Some(row) = row {
             if let Some(label) = row.child() {
                 if let Some(label_widget) = label.downcast_ref::<Label>() {
                     let day = label_widget.label();
-                    content_label_clone
-                        .borrow()
+                    content_header_clone
                         .set_label(&format!("Entries for: {}", day.as_str()));
                 }
             }
@@ -136,8 +152,8 @@ fn build_ui(app: &Application) {
     });
 
     // Add widgets to main box
-    main_box.append(&day_list);
-    main_box.append(&*content_label.borrow());
+    main_box.append(&day_list_scroll_window);
+    main_box.append(&content_scroll_window);
     content.append(&header_bar);
     content.append(&main_box);
 
@@ -153,4 +169,8 @@ fn build_ui(app: &Application) {
     // Display window
     /*window.set_child(Some(&main_box));*/
     window.present();
+}
+
+fn build_day_panel() {
+
 }
