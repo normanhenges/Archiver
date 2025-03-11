@@ -1,14 +1,15 @@
 mod data;
+mod window;
 
 use data::Day;
+use window::Window;
 
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::fs::File;
 use std::io::Read;
-use adw::prelude::*;
-use adw::{ApplicationWindow, WindowTitle, HeaderBar};
-use gtk::{gdk, glib, prelude::*};
+use adw::{ApplicationWindow, WindowTitle, HeaderBar, prelude::*};
+use gtk::{gdk, gio, glib, prelude::*};
 use gtk::{Application, ScrolledWindow, Box as GtkBox, ListBox, ListBoxRow, Label, Entry, Orientation, CssProvider};
 use rusqlite::{Connection, Result};
 
@@ -17,15 +18,21 @@ const DATABASE_FILE: &str = "data/archiver.db";
 const DB_BUILD_SQL_FILE: &str = "sql/build_db.sql";
 
 fn main() {
+    // Register and include resources
+    gio::resources_register_include!("resources.gresource")
+        .expect("Failed to register resources");
+
     let db_result = setup_database();
     match db_result {
         Ok(conn) => {
             println!("Database connection successful");
-            conn.close();
+            match conn.close() {
+                Ok(_) => println!("Database connection closed successfully"),
+                Err(_) => println!("Failed to close database connection"),
+            }
         },
         Err(e) => {
-            println!("Database connection failed: {}", e);
-            return;
+            panic!("Database connection failed: {}", e);
         }
     }
 
@@ -34,7 +41,7 @@ fn main() {
         .build();
 
     app.connect_startup(|_| load_css());
-    app.connect_activate(build_ui);
+    app.connect_activate(build_ui_from_template);
     app.run();
 }
 
@@ -66,21 +73,36 @@ fn load_css() {
     );
 }
 
+fn build_ui_from_template(app: &Application) {
+    // Build libadwaita window
+    let window = Window::new(app);
+    /*let window = ApplicationWindow::builder()
+        .application(app)
+        /*.title("Archiver")*/
+        .default_width(800)
+        .default_height(600)
+        /*content(&content)*/
+        .build();*/
+
+    // Display window
+    window.present();
+}
+
 fn build_ui(app: &Application) {
     // Build header bar necessary for libadwaita
     let header_bar = HeaderBar::builder()
         .title_widget(&WindowTitle::builder().title("Archiver").build())
         .build();
 
-    // Build main content box layout
-    let content = GtkBox::builder()
-        .orientation(Orientation::Vertical)
-        .spacing(0)
-        .build();
-
+    // Build main window layout
     let main_box = GtkBox::builder()
         .orientation(Orientation::Horizontal)
         .spacing(12)
+        .build();
+
+    let content = GtkBox::builder()
+        .orientation(Orientation::Vertical)
+        .spacing(0)
         .build();
 
     // Build srollable day list in left column
