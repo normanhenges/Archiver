@@ -8,9 +8,9 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::fs::File;
 use std::io::Read;
-use adw::{ApplicationWindow, WindowTitle, HeaderBar, prelude::*};
-use gtk::{gdk, gio, glib, prelude::*};
-use gtk::{Application, ScrolledWindow, Box as GtkBox, ListBox, ListBoxRow, Label, Entry, Orientation, CssProvider};
+use adw::{Application, ApplicationWindow, WindowTitle, HeaderBar, prelude::*};
+use gtk::{gdk, gio, glib};
+use gtk::{ScrolledWindow, Box as GtkBox, ListBox, ListBoxRow, Label, Entry, Orientation, CssProvider};
 use rusqlite::{Connection, Result};
 
 const APP_ID: &str = "de.normanhenges.archiver-gtk";
@@ -95,14 +95,14 @@ fn build_ui(app: &Application) {
         .build();
 
     // Build main window layout
-    let main_box = GtkBox::builder()
-        .orientation(Orientation::Horizontal)
-        .spacing(12)
-        .build();
-
     let content = GtkBox::builder()
         .orientation(Orientation::Vertical)
         .spacing(0)
+        .build();
+
+    let main_box = GtkBox::builder()
+        .orientation(Orientation::Horizontal)
+        .spacing(12)
         .build();
 
     // Build srollable day list in left column
