@@ -4,14 +4,22 @@
   <requires lib="adw" version="1.0"/>
 
   <menu id="main-menu">
-    <item>
-      <attribute name="label" translatable="yes">Data Importer</attribute>
-      <attribute name="action">archiver.open-import-window</attribute>
-    </item>
-    <item>
-      <attribute name="label" translatable="yes">Settings</attribute>
-      <attribute name="action">archiver.open-settings-window</attribute>
-    </item>
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Data Importer</attribute>
+        <attribute name="action">archiver.open-import-window</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Settings</attribute>
+        <attribute name="action">archiver.open-settings-window</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">About Archiver</attribute>
+        <attribute name="action">archiver.open-about-window</attribute>
+      </item>
+    </section>
   </menu>
 
   <template class="ArchiverMainWindow" parent="AdwApplicationWindow">
@@ -28,7 +36,7 @@
     </child>
     <property name="content">
       <object class="AdwNavigationSplitView" id="split_view">
-        <property name="min-sidebar-width">200</property>
+        <property name="min-sidebar-width">240</property>
 
         <property name="sidebar">
           <object class="AdwNavigationPage">
